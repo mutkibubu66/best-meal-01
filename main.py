@@ -28,7 +28,7 @@ SENTENCE = (
     "sharp, oily, perfect \u2014 made the whole noisy house go quiet."
 )
 
-OUTPUT_PATH = "/output/entry.txt"
+DEFAULT_OUTPUT_PATH = "/output/entry.txt"
 
 
 def validate(text: str) -> None:
@@ -41,10 +41,13 @@ def validate(text: str) -> None:
         raise ValueError("entry must be a single line")
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
+    # Optional output path for local runs; the grader uses the default.
+    output_path = (argv or [None])[0] if argv else None
+    output_path = output_path or os.environ.get("ENTRY_OUTPUT") or DEFAULT_OUTPUT_PATH
     validate(SENTENCE)
-    os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
-    with open(OUTPUT_PATH, "w", encoding="utf-8") as f:
+    os.makedirs(os.path.dirname(output_path) or ".", exist_ok=True)
+    with open(output_path, "w", encoding="utf-8") as f:
         f.write(SENTENCE)
     print(SENTENCE)
     print(f"({len(SENTENCE)} characters)", file=sys.stderr)
@@ -52,4 +55,4 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    raise SystemExit(main(sys.argv[1:]))
